@@ -6,35 +6,59 @@ import (
 	"testing"
 )
 
-func TestNewThenUnlock(t *testing.T) {
-	baseDir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+var (
+	TestBaseDir  string
+	TestLockFile string
+)
 
-	lockHandle, err := New(baseDir + "/lockFileLock.lock")
+func init() {
+	TestBaseDir, _ = filepath.Abs(filepath.Dir(os.Args[0]))
+	TestLockFile = TestBaseDir + "/testLockFile.lock"
+}
 
-	if err != nil {
-		t.Error("New:", err)
-		return
-	}
+func TestWithoutNew(t *testing.T) {
+	lockHandle := LockHandle{}
 
-	fileInfo, err := lockHandle.file.Stat()
-
-	if fileInfo.Size() < 1 {
-		t.Error("Size:", fileInfo.Size())
-		return
+	err := lockHandle.Lock()
+	if err == nil || err.Error() != "filename empty" {
+		t.Fatal("Lock:", err)
 	}
 
 	err = lockHandle.Unlock()
+	if err != ErrFileAlreadyUnlocked {
+		t.Fatal("Unlock:", err)
+	}
+}
 
+func TestNewFilenameEmpty(t *testing.T) {
+	lockHandle, err := New("")
+
+	if lockHandle != nil {
+		t.Fatal("lockHandle not empty")
+	}
+	if err == nil || err.Error() != "filename empty" {
+		t.Fatal("New:", err)
+	}
+}
+
+func TestNewThenUnlock(t *testing.T) {
+	lockHandle, err := New(TestLockFile)
 	if err != nil {
-		t.Error("Unlock:", err)
-		return
+		t.Fatal("New:", err)
+	}
+
+	fileInfo, err := lockHandle.file.Stat()
+	if fileInfo.Size() < 1 {
+		t.Fatal("Size:", fileInfo.Size())
+	}
+
+	err = lockHandle.Unlock()
+	if err != nil {
+		t.Fatal("Unlock:", err)
 	}
 }
 
 func TestTwoNew(t *testing.T) {
-
-	baseDir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-
 	chanInt := make(chan int, 1)
 
 	go newWaitUnlock(t, chanInt)
@@ -45,43 +69,32 @@ func TestTwoNew(t *testing.T) {
 		return
 	}
 
-	lockHandle, err := New(baseDir + "/lockFileLock.lock")
-
-	if err != nil && lockHandle != nil {
-		chanInt <- 11
-		t.Error("New - lockHandle not nil:", err)
-		return
-	}
-
-	if err == nil {
-		chanInt <- 12
-		t.Error("expected error")
-		return
-	}
-
-	if err != nil && err != ErrFileIsBeingUsed {
-		chanInt <- 12
+	lockHandle, err := New(TestLockFile)
+	if err != ErrFileIsBeingUsed {
 		t.Error("New:", err)
+		chanInt <- 21
+		return
+	}
+	if lockHandle == nil {
+		t.Error("lockHandle nil")
+		chanInt <- 22
 		return
 	}
 
-	chanInt <- 13
+	chanInt <- 23
 
 	<-chanInt
 }
 
 func newWaitUnlock(t *testing.T, chanInt chan int) {
-	baseDir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-
-	lockHandle, err := New(baseDir + "/lockFileLock.lock")
-
+	lockHandle, err := New(TestLockFile)
 	if err != nil {
 		t.Error("New:", err)
-		chanInt <- 1
+		chanInt <- 11
 		return
 	}
 
-	chanInt <- 2
+	chanInt <- 12
 
 	<-chanInt
 
@@ -90,89 +103,83 @@ func newWaitUnlock(t *testing.T, chanInt chan int) {
 	}
 
 	err = lockHandle.Unlock()
-
 	if err != nil {
 		t.Error("Unlock:", err)
 	}
 
-	chanInt <- 3
+	chanInt <- 13
 }
 
 func TestNewTwiceThenUnlock(t *testing.T) {
-	baseDir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-
-	lockHandle, err := New(baseDir + "/lockFileLock.lock")
-
+	lockHandle, err := New(TestLockFile)
 	if err != nil {
-		t.Error("New:", err)
-		return
+		t.Fatal("New:", err)
 	}
 
 	fileInfo, err := lockHandle.file.Stat()
-
 	if fileInfo.Size() < 1 {
-		t.Error("Size:", fileInfo.Size())
-		return
+		t.Fatal("Size:", fileInfo.Size())
 	}
 
-	lockHandle2, err := New(baseDir + "/lockFileLock.lock")
-
-	if err != nil && lockHandle2 != nil {
-		t.Error("New - lockHandle2 not nil:", err)
-		return
+	lockHandle2, err := New(TestLockFile)
+	if err != ErrFileIsBeingUsed {
+		t.Fatal("New 2:", err)
 	}
-
-	if err != nil && err != ErrFileIsBeingUsed {
-		t.Error("New:", err)
-		return
-	}
-
-	if err == nil {
-		t.Error("expected error")
-		return
+	if lockHandle2 == nil {
+		t.Fatal("lockHandle2 nil")
 	}
 
 	err = lockHandle.Unlock()
-
 	if err != nil {
-		t.Error("Unlock:", err)
-		return
+		t.Fatal("Unlock:", err)
 	}
 }
 
 func TestNewThenUnlockTwice(t *testing.T) {
-	baseDir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-
-	lockHandle, err := New(baseDir + "/lockFileLock.lock")
-
+	lockHandle, err := New(TestLockFile)
 	if err != nil {
-		t.Error("New:", err)
-		return
+		t.Fatal("New:", err)
 	}
 
 	fileInfo, err := lockHandle.file.Stat()
-
 	if fileInfo.Size() < 1 {
-		t.Error("Size:", fileInfo.Size())
-		return
+		t.Fatal("Size:", fileInfo.Size())
 	}
 
 	err = lockHandle.Unlock()
-
 	if err != nil {
-		t.Error("Unlock:", err)
-		return
+		t.Fatal("Unlock:", err)
 	}
 
 	err = lockHandle.Unlock()
+	if err != ErrFileAlreadyUnlocked {
+		t.Fatal("Unlock:", err)
+	}
+}
 
-	if err != nil && err.Error() != "nil file pointer" {
-		t.Error("Unlock:", err)
-		return
+func TestNewUnlockLockUnlock(t *testing.T) {
+	lockHandle, err := New(TestLockFile)
+	if err != nil {
+		t.Fatal("New:", err)
 	}
 
-	if err == nil {
-		t.Error("expected error")
-		return
+	fileInfo, err := lockHandle.file.Stat()
+	if fileInfo.Size() < 1 {
+		t.Fatal("Size:", fileInfo.Size())
+	}
+
+	err = lockHandle.Unlock()
+	if err != nil {
+		t.Fatal("Unlock:", err)
+	}
+
+	err = lockHandle.Lock()
+	if err != nil {
+		t.Fatal("Lock:", err)
+	}
+
+	err = lockHandle.Unlock()
+	if err != nil {
+		t.Fatal("Unlock:", err)
 	}
 }

@@ -36,3 +36,9 @@ func Run() error {
   
 }
 ```
+
+If you want the current directory of your application, you can do:
+
+```Go
+baseDir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+```
