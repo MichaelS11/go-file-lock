@@ -59,7 +59,7 @@ func TestTwoNew(t *testing.T) {
 		return
 	}
 
-	if err != nil && err.Error() != "file is being used by another process" {
+	if err != nil && err != ErrFileIsBeingUsed {
 		chanInt <- 12
 		t.Error("New:", err)
 		return
@@ -122,7 +122,7 @@ func TestNewTwiceThenUnlock(t *testing.T) {
 		return
 	}
 
-	if err != nil && err.Error() != "file is being used by another process" {
+	if err != nil && err != ErrFileIsBeingUsed {
 		t.Error("New:", err)
 		return
 	}

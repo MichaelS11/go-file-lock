@@ -13,7 +13,7 @@ func lockFile(lockHandle *lockHandleStruct) error {
 
 	if err != nil && len(err.Error()) > 79 &&
 		err.Error()[len(err.Error())-79:] == "The process cannot access the file because it is being used by another process." {
-		return FileIsBeingUsed
+		return ErrFileIsBeingUsed
 	}
 
 	if err != nil && len(err.Error()) > 42 &&
@@ -25,7 +25,7 @@ func lockFile(lockHandle *lockHandleStruct) error {
 
 	if err != nil && len(err.Error()) > 79 &&
 		err.Error()[len(err.Error())-79:] == "The process cannot access the file because it is being used by another process." {
-		return FileIsBeingUsed
+		return ErrFileIsBeingUsed
 	}
 
 	if err != nil {

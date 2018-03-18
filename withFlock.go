@@ -27,7 +27,7 @@ func lockFile(lockHandle *lockHandleStruct) error {
 	err = syscall.Flock(int(lockHandle.file.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
 
 	if err != nil && err.Error() == "resource temporarily unavailable" {
-		return FileIsBeingUsed
+		return ErrFileIsBeingUsed
 	}
 
 	if err != nil {
