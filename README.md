@@ -15,7 +15,7 @@ go get github.com/MichaelS11/go-file-lock
 
 ```Go
 import (
-	"github.com/MichaelS11/go-file-lock"
+  "github.com/MichaelS11/go-file-lock"
 )
 
 func Run() error {
