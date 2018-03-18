@@ -10,9 +10,12 @@ type lockHandleStruct struct {
 	file     *os.File
 }
 
-var ErrFileIsBeingUsed = errors.New("file is being used by another process") // error returned when file is in use by another program
+var (
+	// error returned when file is in use by another program
+	ErrFileIsBeingUsed = errors.New("file is being used by another process")
+)
 
-// Create a new file lock
+// New creates a new file lock
 func New(filename string) (*lockHandleStruct, error) {
 	lockHandle := &lockHandleStruct{filename: filename}
 
@@ -25,7 +28,7 @@ func New(filename string) (*lockHandleStruct, error) {
 	return lockHandle, nil
 }
 
-// Unlocks file lock
+// Unlock unlocks the file lock
 func (lockHandle *lockHandleStruct) Unlock() error {
 	return unlockFile(lockHandle)
 }
