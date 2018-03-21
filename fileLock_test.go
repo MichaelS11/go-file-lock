@@ -183,3 +183,16 @@ func TestNewUnlockLockUnlock(t *testing.T) {
 		t.Fatal("Unlock:", err)
 	}
 }
+
+func TestNewInvalidFile(t *testing.T) {
+	null := 0
+	lockHandle, err := New(TestLockFile + string(null))
+	if err == nil {
+		t.Fatal("New no error")
+	}
+
+	err = lockHandle.Unlock()
+	if err != ErrFileAlreadyUnlocked {
+		t.Fatal("Unlock:", err)
+	}
+}

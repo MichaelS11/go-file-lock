@@ -10,11 +10,12 @@ func Example_fileLockNewAndUnlock() {
 	lockHandle, err := fileLock.New("myLockFile.lock")
 
 	if err != nil && err == fileLock.ErrFileIsBeingUsed {
-		panic(err)
+		return
 	}
 
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 
 	// do main program
@@ -23,7 +24,7 @@ func Example_fileLockNewAndUnlock() {
 	err = lockHandle.Unlock()
 
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	// output: running
