@@ -1,4 +1,4 @@
-package fileLock_test
+package filelock_test
 
 import (
 	"fmt"
@@ -7,9 +7,9 @@ import (
 )
 
 func Example_fileLockNewAndUnlock() {
-	lockHandle, err := fileLock.New("myLockFile.lock")
+	lockHandle, err := filelock.New("myLockFile.lock")
 
-	if err != nil && err == fileLock.ErrFileIsBeingUsed {
+	if err != nil && err == filelock.ErrFileIsBeingUsed {
 		return
 	}
 

@@ -1,4 +1,4 @@
-package fileLock
+package filelock
 
 import (
 	"os"
@@ -47,7 +47,8 @@ func TestNewThenUnlock(t *testing.T) {
 		t.Fatal("New:", err)
 	}
 
-	fileInfo, err := lockHandle.file.Stat()
+	var fileInfo os.FileInfo
+	fileInfo, err = lockHandle.file.Stat()
 	if fileInfo.Size() < 1 {
 		t.Fatal("Size:", fileInfo.Size())
 	}
@@ -116,7 +117,8 @@ func TestNewTwiceThenUnlock(t *testing.T) {
 		t.Fatal("New:", err)
 	}
 
-	fileInfo, err := lockHandle.file.Stat()
+	var fileInfo os.FileInfo
+	fileInfo, err = lockHandle.file.Stat()
 	if fileInfo.Size() < 1 {
 		t.Fatal("Size:", fileInfo.Size())
 	}
@@ -141,7 +143,8 @@ func TestNewThenUnlockTwice(t *testing.T) {
 		t.Fatal("New:", err)
 	}
 
-	fileInfo, err := lockHandle.file.Stat()
+	var fileInfo os.FileInfo
+	fileInfo, err = lockHandle.file.Stat()
 	if fileInfo.Size() < 1 {
 		t.Fatal("Size:", fileInfo.Size())
 	}
@@ -163,7 +166,8 @@ func TestNewUnlockLockUnlock(t *testing.T) {
 		t.Fatal("New:", err)
 	}
 
-	fileInfo, err := lockHandle.file.Stat()
+	var fileInfo os.FileInfo
+	fileInfo, err = lockHandle.file.Stat()
 	if fileInfo.Size() < 1 {
 		t.Fatal("Size:", fileInfo.Size())
 	}

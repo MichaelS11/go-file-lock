@@ -1,4 +1,4 @@
-package fileLock
+package filelock
 
 import (
 	"errors"

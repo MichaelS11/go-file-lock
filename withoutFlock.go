@@ -1,6 +1,6 @@
 // +build !darwin,!freebsd,!linux
 
-package fileLock
+package filelock
 
 import (
 	"fmt"
