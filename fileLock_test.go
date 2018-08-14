@@ -49,6 +49,9 @@ func TestNewThenUnlock(t *testing.T) {
 
 	var fileInfo os.FileInfo
 	fileInfo, err = lockHandle.file.Stat()
+	if err != nil {
+		t.Fatal("Stat error:", err)
+	}
 	if fileInfo.Size() < 1 {
 		t.Fatal("Size:", fileInfo.Size())
 	}
@@ -119,6 +122,9 @@ func TestNewTwiceThenUnlock(t *testing.T) {
 
 	var fileInfo os.FileInfo
 	fileInfo, err = lockHandle.file.Stat()
+	if err != nil {
+		t.Fatal("Stat error:", err)
+	}
 	if fileInfo.Size() < 1 {
 		t.Fatal("Size:", fileInfo.Size())
 	}
@@ -145,6 +151,9 @@ func TestNewThenUnlockTwice(t *testing.T) {
 
 	var fileInfo os.FileInfo
 	fileInfo, err = lockHandle.file.Stat()
+	if err != nil {
+		t.Fatal("Stat error:", err)
+	}
 	if fileInfo.Size() < 1 {
 		t.Fatal("Size:", fileInfo.Size())
 	}
@@ -168,6 +177,9 @@ func TestNewUnlockLockUnlock(t *testing.T) {
 
 	var fileInfo os.FileInfo
 	fileInfo, err = lockHandle.file.Stat()
+	if err != nil {
+		t.Fatal("Stat error:", err)
+	}
 	if fileInfo.Size() < 1 {
 		t.Fatal("Size:", fileInfo.Size())
 	}
